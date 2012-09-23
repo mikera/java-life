@@ -1,22 +1,28 @@
 package mikera.life;
 
-public class Rules {
-	private int[] grad;
+import mikera.image.Gradient;
+
+public final class Rules {
+	public static final int MAX_VALUE=256;
+	public static final int MAX_COLOUR=256;
+	
+	private int[] colours;
 	private byte[] transitions;
-	private byte[] colourValues;
+	private byte[] effectValues;
 
 	public Rules() {
-		this.grad = new int[256];
-		this.transitions = new byte[256*256];
-		this.colourValues = new byte[256];
+		this.colours = new int[MAX_COLOUR];
+		this.transitions = new byte[MAX_VALUE*MAX_VALUE];
+		this.effectValues = new byte[MAX_VALUE];
+		setupDefaultColours();
 	}
 
-	public int[] getGrad() {
-		return grad;
+	public int[] getColours() {
+		return colours;
 	}
 
-	public void setGrad(int[] grad) {
-		this.grad = grad;
+	public void setColours(int[] grad) {
+		this.colours = grad;
 	}
 
 	public byte[] getTransitions() {
@@ -27,11 +33,22 @@ public class Rules {
 		this.transitions = transitions;
 	}
 
-	public byte[] getColourValues() {
-		return colourValues;
+	public byte[] getEffectValues() {
+		return effectValues;
 	}
 
-	public void setColourValues(byte[] colourValues) {
-		this.colourValues = colourValues;
+	public void setEffectValues(byte[] colourValues) {
+		this.effectValues = colourValues;
+	}
+	
+	void setupDefaultColours() {
+		getColours()[0] = 0xFF000000;
+		getColours()[1] = 0xFFFF0000;
+		getColours()[2] = 0xFFFF8000;
+		getColours()[3] = 0xFFFFFF00;
+		getColours()[4] = 0xFF808000;
+
+		Gradient.fillLinearGradient(getColours(), 5, 0xFF404040, 255,
+				0xFFFFFFFF);
 	}
 }
