@@ -73,6 +73,7 @@ public final class LifeApp implements Runnable {
 			menu.addSeparator();
 			addMenuCommand(menu, "Classic Game Of Life", "rules:life");
 			addMenuCommand(menu, "Magic Mike", "rules:mikera-1");
+			addMenuCommand(menu, "Brian's Brain", "rules:brians-brain");
 			mb.add(menu);
 		}
 

@@ -5,6 +5,7 @@ public class RuleSets {
 		switch (name) {
 		case "life": return setupLifeRules();
 		case "mikera-1": return setupMyRules();
+		case "brians-brain": return setupBriansBrainRules();
 		}
 		
 		
@@ -17,6 +18,18 @@ public class RuleSets {
 		rules.getEffectValues()[1] = 1;
 		rules.setTransitions(0, new int[] { 0, 0, 0, 1 });
 		rules.setTransitions(1, new int[] { 0, 0, 1, 1 });
+		return rules;
+	}
+	
+	static Rules setupBriansBrainRules() {
+		Rules rules=new Rules();
+		rules.getEffectValues()[1] = 1;
+		rules.setTransitions(0, new int[] { 0, 0, 1, 0 });
+		rules.setAllTransitions(1, 2);
+		rules.setAllTransitions(2, 0);
+		rules.getColours()[1] = 0xFFFFFFFF;
+		rules.getColours()[2] = 0xFF0000FF;
+
 		return rules;
 	}
 
