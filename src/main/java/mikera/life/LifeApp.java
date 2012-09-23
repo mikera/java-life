@@ -74,6 +74,7 @@ public final class LifeApp implements Runnable {
 			addMenuCommand(menu, "Classic Game Of Life", "rules:life");
 			addMenuCommand(menu, "Magic Mike", "rules:mikera-1");
 			addMenuCommand(menu, "Brian's Brain", "rules:brians-brain");
+			addMenuCommand(menu, "Warfare", "rules:warfare");
 			mb.add(menu);
 		}
 
@@ -198,7 +199,7 @@ public final class LifeApp implements Runnable {
 		}
 
 		if (s.equals("randomfill")) {
-			engine.fillRandomBinary();
+			engine.fillRandom();
 		}
 
 		if (s.equals("randompoints")) {

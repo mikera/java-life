@@ -6,6 +6,8 @@ public final class Rules {
 	public static final int MAX_VALUE=256;
 	public static final int MAX_COLOUR=256;
 	
+	private int usedValues;
+	
 	private int[] colours;
 	private byte[] transitions;
 	private byte[] effectValues;
@@ -62,5 +64,13 @@ public final class Rules {
 
 		Gradient.fillLinearGradient(getColours(), 5, 0xFF404040, 255,
 				0xFFFFFFFF);
+	}
+
+	public int getUsedValues() {
+		return usedValues;
+	}
+
+	public void setUsedValues(int usedRules) {
+		this.usedValues = usedRules;
 	}
 }

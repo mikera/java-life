@@ -4,7 +4,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-import mikera.image.Gradient;
 import mikera.util.Rand;
 import mikera.util.TextUtils;
 
@@ -100,6 +99,13 @@ public class Engine {
 			changeColour(i, nvalues[i], (byte) Rand.r(2));
 		}
 	}
+	
+	public void fillRandom() {
+		int usedValues=rules.getUsedValues();
+		for (int i = 0; i < nvalues.length; i++) {
+			changeColour(i, nvalues[i], (byte) Rand.r(usedValues));
+		}
+	}
 
 	public void scatterRandomPoints() {
 		for (int i = 0; i < 300; i++) {
@@ -110,8 +116,8 @@ public class Engine {
 
 	void setupRandomRules() {
 		Rules newRules=new Rules();
-		
 		int coloursInUse=2+Rand.r(3)*Rand.r(3)+Rand.r(3);
+		newRules.setUsedValues(coloursInUse);
 
 		clearRules();
 		newRules.getEffectValues()[0] = 0;

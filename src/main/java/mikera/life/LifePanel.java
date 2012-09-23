@@ -1,5 +1,6 @@
 package mikera.life;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -44,5 +45,10 @@ public class LifePanel extends JPanel {
 
 	public void setScale(int scale) {
 		this.scale = scale;
+	}
+	
+	@Override
+	public Dimension getPreferredSize() {
+		return new Dimension(256*scale,256*scale);
 	}
 }
