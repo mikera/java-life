@@ -4,9 +4,10 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 
-public class LifePanel extends JPanel {
+@SuppressWarnings("serial")
+public class LifePanel extends JComponent {
 	private Engine engine=null;
 	private int scale=2;
 

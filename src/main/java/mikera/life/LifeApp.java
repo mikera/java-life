@@ -2,11 +2,9 @@ package mikera.life;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.util.*;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 public final class LifeApp implements Runnable {
 	public static boolean LOGGING = false;
@@ -20,8 +18,10 @@ public final class LifeApp implements Runnable {
 	private byte drawColour = 1;
 	private boolean mouseDown = false;
 	private static final LifeApp app = new LifeApp();
+	
+	private int delay=20;
 
-	private static char keyPress = ' ';
+	private static char keyPress = '[';
 
 	private void menuCommand(MenuItem m, final Object c) {
 		m.addActionListener(new ActionListener() {
@@ -58,12 +58,24 @@ public final class LifeApp implements Runnable {
 			addMenuCommand(menu, "x10", "zoom:10");
 			mb.add(menu);
 		}
+		
+		{
+			Menu menu = new Menu("Speed");
+			addMenuCommand(menu, "Ultra-fast", "speed:1");
+			addMenuCommand(menu, "Fast", "speed:20");
+			addMenuCommand(menu, "Medium", "speed:100");
+			addMenuCommand(menu, "Slow", "speed:250");
+			addMenuCommand(menu, "Very Slow", "speed:1000");
+			mb.add(menu);
+		}
 
 		{
 			Menu menu = new Menu("Simulation");
-			addMenuCommand(menu, "Scatter random points (space)", "randompoints");
+			addMenuCommand(menu, "Scatter random points (p)", "randompoints");
 			addMenuCommand(menu, "Fill with random values (f)", "randomfill");
 			addMenuCommand(menu, "Clear screen", "clear");
+			menu.addSeparator();
+			addMenuCommand(menu, "Pause execution (space)", "pause");
 			mb.add(menu);
 		}
 
@@ -98,7 +110,6 @@ public final class LifeApp implements Runnable {
 		}
 	}
 
-	@SuppressWarnings("serial")
 	public static void main(String[] args) {
 		frame = new JFrame("Life");
 		canvas = new LifePanel();
@@ -107,7 +118,7 @@ public final class LifeApp implements Runnable {
 
 		frame.setMenuBar(app.createMenuBar());
 
-		frame.setSize(400, 400);
+		frame.setSize(600, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(canvas);
 
@@ -174,7 +185,7 @@ public final class LifeApp implements Runnable {
 			}
 
 			try {
-				Thread.sleep(10);
+				Thread.sleep(delay);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -212,7 +223,14 @@ public final class LifeApp implements Runnable {
 
 		if (s.startsWith("zoom")) {
 			canvas.setScale(Integer.parseInt(s.substring(5)));
+			canvas.revalidate();
 		}
+		
+		if (s.startsWith("speed")) {
+			setDelay(Integer.parseInt(s.substring(6)));
+			canvas.revalidate();
+		}
+		
 		
 		if (s.startsWith("rules")) {
 			try {
@@ -221,6 +239,10 @@ public final class LifeApp implements Runnable {
 				System.err.println(x);
 			}
 		}
+	}
+
+	private void setDelay(int delay) {
+		this.delay=delay;
 	}
 
 	private void handleKeyPress() {
@@ -236,11 +258,11 @@ public final class LifeApp implements Runnable {
 			command("randomfill");
 		}
 
-		if (keyPress == ' ') {
+		if (keyPress == 'p') {
 			command("randompoints");
 		}
 
-		if (keyPress == 'p') {
+		if (keyPress == ' ') {
 			command("pause");
 		}
 
