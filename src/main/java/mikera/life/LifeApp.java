@@ -45,17 +45,33 @@ public final class LifeApp implements Runnable {
                         MenuItem m1=new MenuItem("x1");
                         menuCommand(m1,"zoom:1");       
                         menu2.add(m1);
+                        
                         MenuItem m2=new MenuItem("x2");
                         menuCommand(m2,"zoom:2");       
                         menu2.add(m2);
+                        
                         MenuItem m3=new MenuItem("x5");
                         menuCommand(m3,"zoom:5");       
                         menu2.add(m3);
                 }
                 
+                Menu menu3=new Menu("Simulation");
+                {
+                        MenuItem m1=new MenuItem("Scatter random points (space)");
+                        menuCommand(m1,"randompoints");       
+                        menu3.add(m1);
+                        MenuItem m2=new MenuItem("Fill with random values (f)");
+                        menuCommand(m2,"randomfill");       
+                        menu3.add(m2);
+                        MenuItem m3=new MenuItem("Clear screen");
+                        menuCommand(m3,"clear");        
+                        menu3.add(m3);
+                }
+                
                 MenuBar mb=new MenuBar();
                 mb.add(menu);
                 mb.add(menu2);
+                mb.add(menu3);
 
                 return mb;
         }
