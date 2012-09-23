@@ -68,10 +68,19 @@ public final class LifeApp implements Runnable {
                         menu3.add(m3);
                 }
                 
+                Menu menu4=new Menu("Rules");
+                {         
+                    MenuItem m4=new MenuItem("Randomise rules (r)");
+                    menuCommand(m4,"randomrules");       
+                    menu4.add(m4);
+                }
+                
+                
                 MenuBar mb=new MenuBar();
                 mb.add(menu);
                 mb.add(menu2);
                 mb.add(menu3);
+                mb.add(menu4);
 
                 return mb;
         }
@@ -251,7 +260,7 @@ public final class LifeApp implements Runnable {
                 }
                 
                 for (int i=0; i<65536; i++) {
-                        disp[i]=engine.grad[engine.colours[i]&255];
+                        disp[i]=engine.data.getGrad()[engine.values[i]&255];
                 }
                 
                 bi.setRGB(0, 0, 256, 256, disp, 0, 256);
@@ -264,8 +273,8 @@ public final class LifeApp implements Runnable {
         
         public void status() {
                 int pop=0;
-                for (int i=0; i<engine.colours.length; i++) {
-                        if (engine.colours[i]!=0) pop++;
+                for (int i=0; i<engine.values.length; i++) {
+                        if (engine.values[i]!=0) pop++;
                 }
                 
                 System.out.println("Iteration "+(iteration++)+" : population="+pop);
