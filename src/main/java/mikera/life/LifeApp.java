@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.util.*;
 
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 
 public final class LifeApp implements Runnable {
 	public static boolean LOGGING = false;
@@ -49,6 +50,29 @@ public final class LifeApp implements Runnable {
 			menu.add(m3);
 			mb.add(menu);
 		}
+		
+
+		{
+			Menu menu = new Menu("Simulation");
+			addMenuCommand(menu, "Scatter random points (p)", "randompoints");
+			addMenuCommand(menu, "Fill with random values (f)", "randomfill");
+			addMenuCommand(menu, "Clear screen", "clear");
+			menu.addSeparator();
+			addMenuCommand(menu, "Pause execution (space)", "pause");
+			mb.add(menu);
+		}
+		
+
+		{
+			Menu menu = new Menu("Rules");
+			addMenuCommand(menu, "Randomise rules", "randomrules");
+			menu.addSeparator();
+			addMenuCommand(menu, "Classic Game Of Life", "rules:life");
+			addMenuCommand(menu, "Magic Mike", "rules:mikera-1");
+			addMenuCommand(menu, "Brian's Brain", "rules:brians-brain");
+			addMenuCommand(menu, "Warfare", "rules:warfare");
+			mb.add(menu);
+		}
 
 		{
 			Menu menu = new Menu("Zoom");
@@ -66,27 +90,6 @@ public final class LifeApp implements Runnable {
 			addMenuCommand(menu, "Medium", "speed:100");
 			addMenuCommand(menu, "Slow", "speed:250");
 			addMenuCommand(menu, "Very Slow", "speed:1000");
-			mb.add(menu);
-		}
-
-		{
-			Menu menu = new Menu("Simulation");
-			addMenuCommand(menu, "Scatter random points (p)", "randompoints");
-			addMenuCommand(menu, "Fill with random values (f)", "randomfill");
-			addMenuCommand(menu, "Clear screen", "clear");
-			menu.addSeparator();
-			addMenuCommand(menu, "Pause execution (space)", "pause");
-			mb.add(menu);
-		}
-
-		{
-			Menu menu = new Menu("Rules");
-			addMenuCommand(menu, "Randomise rules (r)", "randomrules");
-			menu.addSeparator();
-			addMenuCommand(menu, "Classic Game Of Life", "rules:life");
-			addMenuCommand(menu, "Magic Mike", "rules:mikera-1");
-			addMenuCommand(menu, "Brian's Brain", "rules:brians-brain");
-			addMenuCommand(menu, "Warfare", "rules:warfare");
 			mb.add(menu);
 		}
 
@@ -120,7 +123,9 @@ public final class LifeApp implements Runnable {
 
 		frame.setSize(600, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(canvas);
+		
+		JScrollPane scrollPane = new JScrollPane(canvas);
+		frame.add(scrollPane);
 
 		KeyAdapter ka = new KeyAdapter() {
 			public void keyPressed(KeyEvent k) {
@@ -134,12 +139,14 @@ public final class LifeApp implements Runnable {
 			public void mouseDragged(MouseEvent me) {
 				app.mouseX = me.getX() / canvas.getScale();
 				app.mouseY = me.getY() / canvas.getScale();
+				app.handleMouse();
 			}
 
 			@Override
 			public void mouseMoved(MouseEvent me) {
 				app.mouseX = me.getX() / canvas.getScale();
 				app.mouseY = me.getY() / canvas.getScale();
+				app.handleMouse();
 			}
 		};
 
@@ -148,6 +155,7 @@ public final class LifeApp implements Runnable {
 			public void mousePressed(MouseEvent me) {
 				if (me.getButton() == MouseEvent.BUTTON1) {
 					app.mouseDown = true;
+					app.handleMouse();
 				}
 			}
 
@@ -155,6 +163,7 @@ public final class LifeApp implements Runnable {
 			public void mouseReleased(MouseEvent me) {
 				if (me.getButton() == MouseEvent.BUTTON1) {
 					app.mouseDown = false;
+					app.handleMouse() ;
 				}
 			}
 		};
@@ -168,6 +177,13 @@ public final class LifeApp implements Runnable {
 
 		new Thread(app).run();
 	}
+	
+	private void handleMouse() {
+		if ((mouseDown) && (mouseX < 256) && (mouseY < 256)) {
+			engine.setCell(mouseX, mouseY, drawColour);
+			canvas.repaint();
+		}
+	}
 
 	public void run() {
 		System.out.println("Running lifeapp...");
@@ -178,11 +194,11 @@ public final class LifeApp implements Runnable {
 			status();
 			handleKeyPress();
 			processCommands();
-			canvas.repaint();
 
 			if (running) {
 				engine.calculate();
 			}
+			canvas.repaint();
 
 			try {
 				Thread.sleep(delay);
@@ -250,10 +266,6 @@ public final class LifeApp implements Runnable {
 			command("clear");
 		}
 
-		if (keyPress == 'r') {
-			command("randomrules");
-		}
-
 		if (keyPress == 'f') {
 			command("randomfill");
 		}
@@ -268,10 +280,6 @@ public final class LifeApp implements Runnable {
 
 		if ((keyPress >= '0') && (keyPress <= '9')) {
 			drawColour = (byte) (keyPress - '0');
-		}
-
-		if ((mouseDown) && (mouseX < 256) && (mouseY < 256)) {
-			engine.setCell(mouseX, mouseY, drawColour);
 		}
 
 		keyPress = '`';

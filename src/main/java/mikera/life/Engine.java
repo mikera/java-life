@@ -43,7 +43,7 @@ public class Engine {
 		System.arraycopy(totals, 0, ntotals, 0, totals.length);
 	}
 
-	public void changeColour(int i, byte oldColour, byte newColour) {
+	private void changeColour(int i, byte oldColour, byte newColour) {
 		byte diff = (byte) (value(newColour) - value(oldColour));
 		nvalues[i] = newColour;
 		if (diff == 0)
@@ -58,7 +58,7 @@ public class Engine {
 		ntotals[(i + 257) & 65535] += diff;
 	}
 
-	public void calculate() {
+	public synchronized void calculate() {
 		for (int i = 0; i < values.length; i++) {
 			byte c = values[i];
 			byte tot = totals[i];
@@ -71,7 +71,7 @@ public class Engine {
 		flip();
 	}
 
-	public void setCell(int x, int y, byte c) {
+	public synchronized void setCell(int x, int y, byte c) {
 		int i = (x & 255) + ((y & 255) << 8);
 		byte oc = values[i];
 		changeColour(i, oc, c);
@@ -83,7 +83,7 @@ public class Engine {
 		flip();
 	}
 
-	void clear() {
+	synchronized void clear() {
 		Arrays.fill(nvalues, (byte) 0);
 		Arrays.fill(ntotals, (byte) 0);
 		flip();
