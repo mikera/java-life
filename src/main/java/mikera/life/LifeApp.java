@@ -68,6 +68,9 @@ public final class LifeApp implements Runnable {
 		{
 			Menu menu = new Menu("Rules");
 			addMenuCommand(menu, "Randomise rules (r)", "randomrules");
+			menu.addSeparator();
+			addMenuCommand(menu, "Classic Game Of Life", "rules:life");
+			addMenuCommand(menu, "Magic Mike", "rules:mikera-1");
 			mb.add(menu);
 		}
 
@@ -208,6 +211,14 @@ public final class LifeApp implements Runnable {
 
 		if (s.startsWith("zoom")) {
 			scale = Integer.parseInt(s.substring(5));
+		}
+		
+		if (s.startsWith("rules")) {
+			try {
+			engine.rules=RuleSets.getRules(s.substring(6));
+			} catch (Throwable x) {
+				System.err.println(x);
+			}
 		}
 	}
 
