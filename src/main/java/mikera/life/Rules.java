@@ -41,6 +41,18 @@ public final class Rules {
 		this.effectValues = colourValues;
 	}
 	
+	public void setTransitions(int i, int[] ts) {
+		for (int x = 0; x < ts.length; x++) {
+			getTransitions()[256 * i + x] = (byte) ts[x];
+		}
+	}
+
+	public void setAllTransitions(int i, int ts) {
+		for (int x = 0; x < 256; x++) {
+			getTransitions()[256 * i + x] = (byte) ts;
+		}
+	}
+	
 	void setupDefaultColours() {
 		getColours()[0] = 0xFF000000;
 		getColours()[1] = 0xFFFF0000;

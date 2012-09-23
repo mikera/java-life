@@ -79,8 +79,7 @@ public class Engine {
 	}
 
 	public void setup() {
-		clear();
-		setupMyRules();
+		rules=RuleSets.getRules("life");
 		fillRandomBinary();
 		flip();
 	}
@@ -92,43 +91,9 @@ public class Engine {
 	}
 
 	private void clearRules() {
-		Arrays.fill(rules.getTransitions(), (byte) 0);
-		Arrays.fill(rules.getEffectValues(), (byte) 0);
+		rules=new Rules();
 	}
 
-	void setupLifeRules() {
-		rules.getEffectValues()[1] = 1;
-		setTransitions(0, new int[] { 0, 0, 0, 1 });
-		setTransitions(1, new int[] { 0, 0, 1, 1 });
-	}
-
-	void setupMyRules() {
-		rules.getEffectValues()[1] = 1;
-		rules.getEffectValues()[2] = 2;
-		rules.getEffectValues()[3] = 3;
-		rules.getEffectValues()[4] = -1;
-		setTransitions(0, new int[] { 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
-				0, 0 });
-		setTransitions(1, new int[] { 0, 0, 1, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0,
-				0, 0 });
-		setTransitions(2, new int[] { 0, 0, 1, 3, 0, 4, 2, 1, 1, 0, 0, 0, 0, 0,
-				0, 0 });
-		setTransitions(3, new int[] { 0, 4, 0, 4, 2, 4, 4, 4, 1, 4, 0, 4, 0, 4,
-				0, 4 });
-		setAllTransitions(4, 5);
-	}
-
-	private void setTransitions(int i, int[] ts) {
-		for (int x = 0; x < ts.length; x++) {
-			rules.getTransitions()[256 * i + x] = (byte) ts[x];
-		}
-	}
-
-	private void setAllTransitions(int i, int ts) {
-		for (int x = 0; x < 256; x++) {
-			rules.getTransitions()[256 * i + x] = (byte) ts;
-		}
-	}
 
 	public void fillRandomBinary() {
 		for (int i = 0; i < nvalues.length; i++) {
