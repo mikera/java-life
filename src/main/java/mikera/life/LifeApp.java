@@ -12,10 +12,9 @@ public final class LifeApp implements Runnable {
 	public static boolean LOGGING = false;
 
 	public static JFrame frame;
-	public static JPanel canvas;
+	public static LifePanel canvas;
 	public static Engine engine = new Engine();
 	private boolean running = true;
-	private int scale = 3;
 	private int mouseX;
 	private int mouseY;
 	private byte drawColour = 1;
@@ -80,7 +79,7 @@ public final class LifeApp implements Runnable {
 		return mb;
 	}
 
-	public Queue<Object> commandQueue = new LinkedList<Object>();
+	public Queue<Object> commandQueue = new LinkedList<>();
 
 	public void command(Object o) {
 		synchronized (commandQueue) {
@@ -97,9 +96,11 @@ public final class LifeApp implements Runnable {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	public static void main(String[] args) {
 		frame = new JFrame("Life");
-		canvas = new JPanel();
+		canvas = new LifePanel();
+		canvas.setEngine(engine);
 		canvas.setBackground(Color.DARK_GRAY);
 
 		frame.setMenuBar(app.createMenuBar());
@@ -118,14 +119,14 @@ public final class LifeApp implements Runnable {
 		MouseMotionListener mma = new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent me) {
-				app.mouseX = me.getX() / app.scale;
-				app.mouseY = me.getY() / app.scale;
+				app.mouseX = me.getX() / canvas.getScale();
+				app.mouseY = me.getY() / canvas.getScale();
 			}
 
 			@Override
 			public void mouseMoved(MouseEvent me) {
-				app.mouseX = me.getX() / app.scale;
-				app.mouseY = me.getY() / app.scale;
+				app.mouseX = me.getX() / canvas.getScale();
+				app.mouseY = me.getY() / canvas.getScale();
 			}
 		};
 
@@ -164,7 +165,7 @@ public final class LifeApp implements Runnable {
 			status();
 			handleKeyPress();
 			processCommands();
-			display();
+			canvas.repaint();
 
 			if (running) {
 				engine.calculate();
@@ -208,7 +209,7 @@ public final class LifeApp implements Runnable {
 		}
 
 		if (s.startsWith("zoom")) {
-			scale = Integer.parseInt(s.substring(5));
+			canvas.setScale(Integer.parseInt(s.substring(5)));
 		}
 		
 		if (s.startsWith("rules")) {
@@ -250,24 +251,6 @@ public final class LifeApp implements Runnable {
 		}
 
 		keyPress = '`';
-	}
-
-	BufferedImage bi = null;
-	int[] disp = new int[65536];
-
-	private void display() {
-		if (bi == null) {
-			bi = new BufferedImage(256, 256, BufferedImage.TYPE_INT_ARGB);
-		}
-
-		for (int i = 0; i < 65536; i++) {
-			disp[i] = engine.rules.getColours()[engine.values[i] & 255];
-		}
-
-		bi.setRGB(0, 0, 256, 256, disp, 0, 256);
-
-		Graphics g = canvas.getGraphics();
-		g.drawImage(bi, 0, 0, 256 * scale, 256 * scale, null);
 	}
 
 	int iteration = 0;
