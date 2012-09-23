@@ -5,11 +5,14 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 public final class LifeApp implements Runnable {
 	public static boolean LOGGING = false;
 
-	public static Frame frame;
-	public static Canvas canvas;
+	public static JFrame frame;
+	public static JPanel canvas;
 	public static Engine engine = new Engine();
 	private boolean running = true;
 	private int scale = 3;
@@ -95,24 +98,19 @@ public final class LifeApp implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		frame = new Frame("Life");
-		canvas = new Canvas();
+		frame = new JFrame("Life");
+		canvas = new JPanel();
 		canvas.setBackground(Color.DARK_GRAY);
 
 		frame.setMenuBar(app.createMenuBar());
 
 		frame.setSize(400, 400);
-		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				System.exit(0);
-			}
-		});
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(canvas);
 
 		KeyAdapter ka = new KeyAdapter() {
 			public void keyPressed(KeyEvent k) {
 				char c = k.getKeyChar();
-
 				keyPress = c;
 			}
 		};
