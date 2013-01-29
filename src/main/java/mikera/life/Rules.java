@@ -1,6 +1,6 @@
 package mikera.life;
 
-import mikera.image.Gradient;
+import mikera.image.generation.Gradient;
 
 public final class Rules {
 	public static final int MAX_VALUE=256;
