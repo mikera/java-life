@@ -3,6 +3,8 @@
 
 Flexible cellular automata system inspired by Conway's Game of Life
 
+Comes with a simple GUI
+
 ### Key features
 
  - Extremely fast engine using rule lookup tables
