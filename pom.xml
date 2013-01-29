@@ -39,4 +39,12 @@
 			<version>1.4.2</version>
 		</dependency>
 	</dependencies>
+	
+	<repositories>
+		<repository>
+			<id>clojars.org</id>
+			<name>Clojars repository</name>
+			<url>https://clojars.org/repo</url>
+		</repository>
+	</repositories>
 </project>
