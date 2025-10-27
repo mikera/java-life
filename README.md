@@ -1,9 +1,10 @@
 # java-life
 
+![Java Life](life.png)
 
 Flexible cellular automata system inspired by Conway's Game of Life
 
-Comes with a simple GUI
+Comes with a simple GUI, but there's a lot more power in the underlying system for programmable use.
 
 ### Key features
 
