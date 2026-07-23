@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>net.mikera</groupId>
 		<artifactId>mikera-pom</artifactId>
-		<version>0.0.4</version>
+		<version>0.6.0</version>
 	</parent>
 
 	<licenses>
@@ -20,23 +20,38 @@
 	</licenses>
 
 	<properties>
-		<junit.version>6.1.0</junit.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.release>21</maven.compiler.release>
+		<junit.version>6.1.2</junit.version>
+		<compiler.plugin.version>3.15.0</compiler.plugin.version>
+		<surefire.plugin.version>3.5.6</surefire.plugin.version>
+		<javadoc.plugin.version>3.12.0</javadoc.plugin.version>
 	</properties>
 
 	<build>
 		<plugins>
+			<!-- Pinned explicitly: the parent pom still supplies a very old compiler plugin. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>17</source>
-					<target>17</target>
-				</configuration>
+				<version>${compiler.plugin.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.5.6</version>
+				<version>${surefire.plugin.version}</version>
+			</plugin>
+			<!--
+				combine.self="override" discards the parent's configuration, which uses
+				the additionalparam option removed in javadoc plugin 3.x.
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${javadoc.plugin.version}</version>
+				<configuration combine.self="override">
+					<doclint>none</doclint>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

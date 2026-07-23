@@ -21,13 +21,17 @@ Licence: GPL. Upstream: https://github.com/mikera/java-life
 
 | Item | Value |
 |------|-------|
-| Language | Java 17 (`maven-compiler-plugin` source/target 17) |
-| Build | Maven (`pom.xml`, parent `net.mikera:mikera-pom:0.0.4`) |
+| Language | Java 21 (`maven.compiler.release`) |
+| Build | Maven (`pom.xml`, parent `net.mikera:mikera-pom:0.6.0`) |
 | Dependency | `net.mikera:mikera:1.6.1` (from Clojars) — `Rand`, `TextUtils`, `Gradient` |
 | GUI | AWT + Swing (`JFrame`, `JComponent`, AWT `MenuBar`) |
-| Tests | JUnit 6 (`org.junit.jupiter:junit-jupiter`, pinned via `${junit.version}`) |
-| CI | GitHub Actions — `.github/workflows/ci.yml`, builds on JDK 17 and 21 |
+| Tests | JUnit 6 (`org.junit.jupiter:junit-jupiter`) |
+| CI | GitHub Actions — `.github/workflows/ci.yml`, builds on JDK 21 and 25 |
 | Branch | `master` |
+
+Plugin and dependency versions live in `<properties>` at the top of `pom.xml`.
+**Pin build plugins explicitly** — the parent pom supplies versions old enough to
+matter (it would otherwise hand us maven-compiler-plugin 2.5.1).
 
 ## Project structure
 
@@ -154,7 +158,6 @@ Confirmed by review, still unfixed. Do not treat these as intentional.
 | `LifeApp.java:178` | `new Thread(app).run()` calls `run()` directly on the calling thread instead of `start()`. The `Thread` is pointless and the simulation loop blocks `main`. |
 | `LifeApp.java:47-50` | File → "Open..." / "Save As..." have no action listeners. `Engine.saveRules` is unwired and there is no loader — the README's `TODO: save / load rulesets`. |
 | `RuleSets.java:13` | Throws raw `Error` for an unknown ruleset name; should be `IllegalArgumentException`. Tests currently assert `Error`, so change both together. |
-| `pom.xml` | Targets Java 17 while the workspace standard is Java 21+. CI builds both. |
 
 ## Conventions
 
