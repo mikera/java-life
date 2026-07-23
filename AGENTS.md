@@ -105,15 +105,33 @@ Writes go to the shadow buffers `nvalues` / `ntotals`; `flip()` swaps them with
 
 ### Rulesets
 
-`RuleSets.getRules(name)` returns the built-ins: `life`, `mikera-1`,
-`brians-brain`, `warfare`. A `Rules` object is three tables:
+A `Rules` object is three tables:
 
 - `transitions[from * 256 + total]` → next state
 - `effectValues[state]` → what this state contributes to its neighbours' totals
 - `colours[state]` → ARGB colour for rendering
 
-Adding a ruleset means adding a `setupXxxRules()` method and a `case` in
-`getRules`, plus a menu entry in `LifeApp.createMenuBar()` (`"rules:<name>"`).
+Because the engine looks up `transitions[state][Σ neighbour weights]`, it covers
+the whole class of **outer-totalistic** automata. Two standard notations map
+straight onto it, and `RuleSets` has a builder for each:
+
+| Notation | Builder | Meaning |
+|----------|---------|---------|
+| Life-like `B/S` | `lifeLike(born, survives)` | Two states, live weighs 1. Conway's Life is `lifeLike("3", "23")`. |
+| Generations `S/B/C` | `generations(survives, born, states)` | As above, but a cell leaving the live state ages through `C-2` refractory states before dying. Only state 1 has a non-zero weight, so ageing cells are invisible to neighbours. Brian's Brain is `generations("", "2", 3)`. |
+
+**Weights are what make the engine more expressive than either notation.** With
+two species weighing 1 and 16, a total of `a + 16b` encodes both neighbour
+counts without collision — neither can exceed 8, so the low nibble never carries
+into the high one, and the maximum total of 136 still fits the 256-entry table.
+`setupRivalRules` uses this to make a rule that depends on *both* counts, which
+`B/S` cannot express. The same trick generalises to any weights that separate
+cleanly given the 8-neighbour cap.
+
+Adding a ruleset means a `case` in `getRules` plus an entry in the matching
+catalogue array (`LIFE_LIKE`, `GENERATIONS`, `WEIGHTED`). The menu is built from
+those arrays, so there is no third place to update — and
+`everyCatalogueEntryResolves` fails if a catalogue entry has no `case`.
 
 ## Build and test
 

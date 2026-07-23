@@ -38,6 +38,15 @@ public final class LifeApp implements Runnable {
 		menu.add(m1);
 	}
 
+	/** Builds a submenu from a RuleSets catalogue of {label, ruleset name} pairs. */
+	private Menu rulesMenu(String title, String[][] entries) {
+		Menu menu = new Menu(title);
+		for (String[] entry : entries) {
+			addMenuCommand(menu, entry[0], "rules:" + entry[1]);
+		}
+		return menu;
+	}
+
 	public MenuBar createMenuBar() {
 		MenuBar mb = new MenuBar();
 
@@ -67,10 +76,9 @@ public final class LifeApp implements Runnable {
 			Menu menu = new Menu("Rules");
 			addMenuCommand(menu, "Randomise rules", "randomrules");
 			menu.addSeparator();
-			addMenuCommand(menu, "Classic Game Of Life", "rules:life");
-			addMenuCommand(menu, "Magic Mike", "rules:mikera-1");
-			addMenuCommand(menu, "Brian's Brain", "rules:brians-brain");
-			addMenuCommand(menu, "Warfare", "rules:warfare");
+			menu.add(rulesMenu("Life-like", RuleSets.LIFE_LIKE));
+			menu.add(rulesMenu("Generations", RuleSets.GENERATIONS));
+			menu.add(rulesMenu("Weighted", RuleSets.WEIGHTED));
 			mb.add(menu);
 		}
 

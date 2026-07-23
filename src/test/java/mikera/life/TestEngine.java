@@ -274,4 +274,124 @@ public class TestEngine {
 		}
 		assertThrows(Error.class, () -> RuleSets.getRules("no-such-ruleset"));
 	}
+
+	/** Guards against the menu catalogue drifting away from the getRules switch. */
+	@Test
+	public void everyCatalogueEntryResolves() {
+		for (String[][] catalogue : new String[][][] {
+				RuleSets.LIFE_LIKE, RuleSets.GENERATIONS, RuleSets.WEIGHTED }) {
+			for (String[] entry : catalogue) {
+				Rules rules = RuleSets.getRules(entry[1]);
+				assertNotNull(rules, entry[1]);
+				assertTrue(rules.getUsedValues() >= 2,
+						entry[1] + " should use at least two states");
+			}
+		}
+	}
+
+	/**
+	 * Runs every catalogue ruleset from a dense random soup. A typo in a B/S
+	 * string usually shows up as a rule that annihilates itself immediately, which
+	 * the table-shape assertions above would not catch.
+	 */
+	@Test
+	public void everyRulesetSustainsActivity() {
+		for (String[][] catalogue : new String[][][] {
+				RuleSets.LIFE_LIKE, RuleSets.GENERATIONS, RuleSets.WEIGHTED }) {
+			for (String[] entry : catalogue) {
+				Engine e = new Engine();
+				e.rules = RuleSets.getRules(entry[1]);
+				e.fillRandomBinary();
+				e.flip();
+
+				for (int gen = 0; gen < 20; gen++) {
+					e.calculate();
+				}
+
+				int population = 0;
+				for (byte v : e.values) {
+					if (v != 0) population++;
+				}
+				assertTrue(population > 0, entry[1] + " died out within 20 generations");
+			}
+		}
+	}
+
+	@Test
+	public void lifeLikeEncodesBirthAndSurvivalCounts() {
+		Rules highLife = RuleSets.getRules("highlife"); // B36/S23
+
+		for (int n = 0; n <= 8; n++) {
+			assertEquals((byte) (n == 3 || n == 6 ? 1 : 0), highLife.getTransitions()[n],
+					"birth on " + n);
+			assertEquals((byte) (n == 2 || n == 3 ? 1 : 0), highLife.getTransitions()[256 + n],
+					"survival on " + n);
+		}
+	}
+
+	@Test
+	public void replicatorTurnsOneCellIntoARing() {
+		Engine e = new Engine();
+		e.rules = RuleSets.getRules("replicator"); // B1357/S1357
+		setCells(e, (byte) 1, new int[] { 100, 100 });
+
+		// The centre has no live neighbours, so it dies; each of the eight
+		// surrounding cells sees exactly one, so all eight are born.
+		e.calculate();
+
+		assertEquals(Set.of(
+				index(99, 99), index(100, 99), index(101, 99),
+				index(99, 100), index(101, 100),
+				index(99, 101), index(100, 101), index(101, 101)), liveCells(e));
+		assertTotalsConsistent(e);
+	}
+
+	@Test
+	public void generationsAgeThroughRefractoryStates() {
+		Rules starWars = RuleSets.getRules("star-wars"); // 345/2/4
+		assertEquals(4, starWars.getUsedValues());
+
+		// A live cell that fails to survive enters the ageing chain 2 -> 3 -> 0,
+		// and ageing states advance regardless of their neighbours.
+		assertEquals((byte) 2, starWars.getTransitions()[256 + 1]);
+		assertEquals((byte) 1, starWars.getTransitions()[256 + 3]);
+		for (int n = 0; n <= 8; n++) {
+			assertEquals((byte) 3, starWars.getTransitions()[512 + n]);
+			assertEquals((byte) 0, starWars.getTransitions()[768 + n]);
+		}
+
+		// Only the live state is visible to neighbours.
+		assertEquals((byte) 1, starWars.getEffectValues()[1]);
+		assertEquals((byte) 0, starWars.getEffectValues()[2]);
+		assertEquals((byte) 0, starWars.getEffectValues()[3]);
+	}
+
+	@Test
+	public void weightedRulesTellTheTwoSpeciesApart() {
+		// Species A weighs 1 and B weighs 16, so three of one is a different
+		// total from three of the other - something B/S notation cannot express.
+		Engine a = new Engine();
+		a.rules = RuleSets.getRules("rival");
+		setCells(a, (byte) 1, new int[] { 99, 99 }, new int[] { 100, 99 }, new int[] { 101, 99 });
+		a.calculate();
+		assertEquals((byte) 1, a.values[index(100, 100)]);
+		assertTotalsConsistent(a);
+
+		Engine b = new Engine();
+		b.rules = RuleSets.getRules("rival");
+		setCells(b, (byte) 2, new int[] { 99, 99 }, new int[] { 100, 99 }, new int[] { 101, 99 });
+		b.calculate();
+		assertEquals((byte) 2, b.values[index(100, 100)]);
+		assertTotalsConsistent(b);
+
+		// A mixed neighbourhood gives neither species a claim.
+		Engine mixed = new Engine();
+		mixed.rules = RuleSets.getRules("rival");
+		mixed.setCell(99, 99, (byte) 1);
+		mixed.setCell(100, 99, (byte) 1);
+		mixed.setCell(101, 99, (byte) 2);
+		mixed.calculate();
+		assertEquals((byte) 0, mixed.values[index(100, 100)]);
+		assertTotalsConsistent(mixed);
+	}
 }
