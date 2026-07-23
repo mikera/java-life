@@ -71,10 +71,18 @@ public class Engine {
 		flip();
 	}
 
+	/**
+	 * Sets a single cell, publishing the change immediately.
+	 *
+	 * The old colour must be read from nvalues, not values: changeColour applies
+	 * its delta to the shadow totals, so it has to be relative to whatever the
+	 * shadow buffer already records. Reading values instead would double-count
+	 * repeated writes to the same cell between flips.
+	 */
 	public synchronized void setCell(int x, int y, byte c) {
 		int i = (x & 255) + ((y & 255) << 8);
-		byte oc = values[i];
-		changeColour(i, oc, c);
+		changeColour(i, nvalues[i], c);
+		flip();
 	}
 
 	public void setup() {

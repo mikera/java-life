@@ -84,6 +84,12 @@ Writes go to the shadow buffers `nvalues` / `ntotals`; `flip()` swaps them with
   the `fill*` helpers, which call it). Never assign into `values[]` or
   `nvalues[]` directly — it silently desynchronises `totals` and the automaton
   quietly produces garbage.
+- **`changeColour`'s old-colour argument must come from `nvalues`, not `values`.**
+  It applies its delta to the *shadow* totals, so the delta has to be relative to
+  what the shadow buffer already records. Passing `values[i]` double-counts any
+  repeated write to the same cell between flips. `calculate` is the one exception
+  and is safe: it visits each index once, before anything else has touched
+  `nvalues[i]` that pass.
 - **`values`, `totals` and `effectValues` are `byte[]` — signed, with deliberate
   wraparound.** Always index with `& 255`. Negative effect values are a feature
   (see the `warfare` ruleset).
@@ -135,8 +141,8 @@ brute force and compares. **Assert it after any test that mutates state** — it
 is what catches a broken incremental update, which is otherwise invisible until
 the automaton drifts several generations later.
 
-Mutating helper: `setCells(engine, colour, cells...)` sets cells and flips.
-Cells passed in one call must be distinct (see the note on `setCell` below).
+Mutating helper: `setCells(engine, colour, cells...)`. `setCell` publishes each
+write, so repeats and same-cell overwrites are safe.
 
 ## Known issues
 
@@ -144,7 +150,6 @@ Confirmed by review, still unfixed. Do not treat these as intentional.
 
 | Where | Issue |
 |-------|-------|
-| `Engine.setCell` | Reads the old colour from `values` but writes to `nvalues`. Calling it twice on the same cell before a `flip()` computes the second delta from stale state and corrupts `totals`. It also means cells drawn while the simulation is paused do not appear until the next step, since `LifePanel` renders `values`. |
 | `Engine.setupRandomRules` | Replaces `rules` without recomputing `totals`, so totals are stale against the new effect values until the grid is refilled. |
 | `LifeApp.java:178` | `new Thread(app).run()` calls `run()` directly on the calling thread instead of `start()`. The `Thread` is pointless and the simulation loop blocks `main`. |
 | `LifeApp.java:47-50` | File → "Open..." / "Save As..." have no action listeners. `Engine.saveRules` is unwired and there is no loader — the README's `TODO: save / load rulesets`. |

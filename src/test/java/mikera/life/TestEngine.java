@@ -27,16 +27,11 @@ public class TestEngine {
 		return e;
 	}
 
-	/**
-	 * Sets cells to a colour and publishes them. Cells must be distinct: setCell
-	 * reads the old colour from values but writes to nvalues, so setting the same
-	 * cell twice before a flip would compute the second delta from stale state.
-	 */
+	/** Sets cells to a colour. setCell publishes each write, so repeats are safe. */
 	private static void setCells(Engine e, byte colour, int[]... cells) {
 		for (int[] c : cells) {
 			e.setCell(c[0], c[1], colour);
 		}
-		e.flip();
 	}
 
 	private static Set<Integer> liveCells(Engine e) {
@@ -79,6 +74,53 @@ public class TestEngine {
 		for (int d : NEIGHBOURS) {
 			assertEquals((byte) 1, e.totals[(i + d) & 65535]);
 		}
+		assertTotalsConsistent(e);
+	}
+
+	@Test
+	public void repeatedSetCellDoesNotDoubleCount() {
+		Engine e = lifeEngine();
+		int i = index(100, 100);
+
+		// Painting the same cell repeatedly is what a mouse drag does. Each write
+		// must be idempotent, not accumulate into the neighbours' totals.
+		for (int n = 0; n < 3; n++) {
+			setCells(e, (byte) 1, new int[] { 100, 100 });
+			assertEquals((byte) 1, e.values[i]);
+			assertEquals((byte) 1, e.totals[(i + 1) & 65535]);
+			assertTotalsConsistent(e);
+		}
+	}
+
+	@Test
+	public void setCellCanChangeAndClearACellBetweenSteps() {
+		Engine e = new Engine();
+		e.rules = RuleSets.getRules("warfare"); // state 2 has effect value -1
+		int i = index(100, 100);
+
+		setCells(e, (byte) 1, new int[] { 100, 100 });
+		assertEquals((byte) 1, e.totals[(i + 1) & 65535]);
+		assertTotalsConsistent(e);
+
+		setCells(e, (byte) 2, new int[] { 100, 100 });
+		assertEquals((byte) 2, e.values[i]);
+		assertEquals((byte) -1, e.totals[(i + 1) & 65535]);
+		assertTotalsConsistent(e);
+
+		setCells(e, (byte) 0, new int[] { 100, 100 });
+		assertEquals((byte) 0, e.values[i]);
+		assertEquals((byte) 0, e.totals[(i + 1) & 65535]);
+		assertTotalsConsistent(e);
+	}
+
+	@Test
+	public void setCellIsVisibleWithoutStepping() {
+		Engine e = lifeEngine();
+		e.setCell(100, 100, (byte) 1);
+
+		// LifePanel renders values, so a cell drawn while paused - with no
+		// calculate() to flip the buffers - must already be there.
+		assertEquals((byte) 1, e.values[index(100, 100)]);
 		assertTotalsConsistent(e);
 	}
 
