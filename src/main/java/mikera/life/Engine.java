@@ -89,11 +89,6 @@ public class Engine {
 		flip();
 	}
 
-	private void clearRules() {
-		rules=new Rules();
-	}
-
-
 	public void fillRandomBinary() {
 		for (int i = 0; i < nvalues.length; i++) {
 			changeColour(i, nvalues[i], (byte) Rand.r(2));
@@ -119,7 +114,6 @@ public class Engine {
 		int coloursInUse=2+Rand.r(3)*Rand.r(3)+Rand.r(3);
 		newRules.setUsedValues(coloursInUse);
 
-		clearRules();
 		newRules.getEffectValues()[0] = 0;
 		for (int i = 1; i < 256; i++) {
 			newRules.getEffectValues()[i] = Rand.nextByte();
@@ -137,7 +131,8 @@ public class Engine {
 		
 		// clear the rest
 		for (int fromValue = coloursInUse; fromValue < Rules.MAX_VALUE; fromValue++) {
-			Arrays.fill(newRules.getTransitions(),(byte)0);
+			int base = fromValue * 256;
+			Arrays.fill(newRules.getTransitions(), base, base + 256, (byte) 0);
 			newRules.getEffectValues()[fromValue]=0;
 		}
 
