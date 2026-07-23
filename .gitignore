@@ -2,3 +2,6 @@
 /.project
 /.settings
 /target
+
+# Agent tooling — local, per-machine settings
+/.claude/settings.local.json
